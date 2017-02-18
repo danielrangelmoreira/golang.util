@@ -11,7 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-const firstmsg = `#P__time,S_652870591E03400E87B6CF31670630CE000003`
+const firstmsg = `#P__time,S_4E84D46788AB33C0B5473A837DF6D0EA000003`
 
 var addr = flag.String("addr", "premws-pt3.365lpodds.com", "http service address")
 
@@ -20,8 +20,10 @@ var myDialer = &websocket.Dialer{
 	EnableCompression: true,
 }
 var myHeader = http.Header{
-	"Origin":                 []string{"https://www.bet365.com"},
-	"Sec-WebSocket-Protocol": []string{"zap-protocol-v1"},
+	"Origin":                   []string{"https://www.bet365.com"},
+	"Sec-WebSocket-Protocol":   []string{"zap-protocol-v1"},
+	"User-Agent":               []string{"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36"},
+	"Sec-WebSocket-Extensions": []string{"permessage-deflate; client_max_window_bits"},
 }
 
 func ReadSocket(c *websocket.Conn) {
@@ -55,6 +57,7 @@ func main() {
 		log.Printf("connected! \n")
 
 	}
+
 	defer c.Close()
 
 	err = c.WriteMessage(websocket.BinaryMessage, []byte(firstmsg))

@@ -27,9 +27,6 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt)
 
 	u := url.URL{Scheme: "wss", Host: *addr, Path: "/WebSocketConnection-Secure"}
-	//q := u.Query()
-	//q.Set("uid", "8028029670432842")
-	//u.RawQuery = q.Encode()
 
 	myHeader["Origin"] = []string{"http://www.resultados.com"}
 	myHeader["Sec-WebSocket-Protocol"] = []string{"zap-protocol-v1"}
@@ -42,21 +39,19 @@ func main() {
 		log.Fatal("dial:", err)
 	} else if resp.StatusCode == http.StatusSwitchingProtocols {
 		log.Printf("connected! \n")
-		for k, v := range resp.Header {
-			log.Printf("%s :  %s\n", k, v)
-		}
 	}
 	defer c.Close()
 
 	done := make(chan struct{})
-	count := make(chan int)
+	count := make(chan int, 3)
 	go func() {
-		defer c.Close()
 		defer close(done)
 
 		for {
+			log.Println("im back")
 			log.Println(<-count)
 			_, message, err := c.NextReader()
+
 			if err != nil {
 				log.Println("read:", err)
 				return
@@ -72,8 +67,9 @@ func main() {
 
 		select {
 		case <-ticker.C:
+			log.Println("writing")
 			err := c.WriteMessage(websocket.BinaryMessage, []byte("4`"))
-
+			log.Println("wrote")
 			if err != nil {
 				log.Println("write:", err)
 				return
@@ -88,11 +84,6 @@ func main() {
 				log.Println("write close:", err)
 				return
 			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-			c.Close()
 			return
 		}
 	}

@@ -29,28 +29,24 @@ func ReadSocket(c *websocket.Conn) {
 			log.Println("read:", err)
 			return
 		}
-		log.Printf("recv: %s", message)
+		log.Printf("recv: %s\n", message)
 	}
 }
 
 func main() {
 	flag.Parse()
-	log.SetFlags(0)
-	myHeader := make(http.Header, 1)
 
 	u := url.URL{Scheme: "wss", Host: *addr, Path: "/WebSocketConnection-Secure"}
 
-	myHeader["Origin"] = []string{"http://www.resultados.com"}
-	myHeader["Sec-WebSocket-Protocol"] = []string{"zap-protocol-v1"}
-
 	log.Printf("connecting to %s", u.String())
 
-	c, resp, err := myDialer.Dial(u.String(), myHeader)
-
+	c, resp, err := myDialer.Dial(u.String(), nil)
 	if err != nil {
 		log.Fatal("dial:", err)
+
 	} else if resp.StatusCode == http.StatusSwitchingProtocols {
 		log.Printf("connected! \n")
+
 	}
 	defer c.Close()
 
