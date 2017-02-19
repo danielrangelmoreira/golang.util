@@ -55,12 +55,12 @@ func handleConn(conn net.Conn) {
 
 	go clientWrite(conn, ch)
 	go idleCloser(conn, timer)
+
 	ch <- "You are: " + who
 	messages <- who + " has arrived"
 	entering <- cli
 
 	input := bufio.NewScanner(conn)
-
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
 		timer.Reset(60 * time.Second)
