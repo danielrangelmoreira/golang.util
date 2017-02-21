@@ -131,7 +131,7 @@ func main() {
 	}
 
 	//fmt.Printf("%x\n %[1]t\n", myhash[0].Sum(nil))
-	fmt.Printf("number of different bits: %d\n", ShaCompare(myhash[0].Sum(nil), myhash[1].Sum(nil)))
+	//fmt.Printf("number of different bits: %d\n", ShaCompare(myhash[0].Sum(nil), myhash[1].Sum(nil)))
 	/*fmt.Printf("%t\n", filename2.set)
 
 	if filename1.set {

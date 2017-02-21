@@ -1,13 +1,14 @@
 package main
 
-import(
-    "fmt"
-    "bytes"
-    //"strings"
+import (
+	"fmt"
 )
-func main()  {
-    var buf bytes.Buffer
-    var teste = "Isso é uma string de caracteres"
-    buf.WriteString(teste)
-    fmt.Println(buf)
+
+func main() {
+	var a, b, c int64
+	b = 3
+	c = 4
+	fmt.Println(a, b, c)
+	a = b + c
+	fmt.Println(a, b, c)
 }

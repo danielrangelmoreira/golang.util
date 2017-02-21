@@ -39,31 +39,41 @@ func main() {
 	}
 }
 func idleCloser(conn net.Conn, timer *time.Timer) {
-	for {
-		select {
-		case <-timer.C:
-			conn.Close()
-
-		}
+	select {
+	case <-timer.C:
+		conn.Close()
 	}
 }
+func getScreenName(conn net.Conn) (name string) {
+	fmt.Fprintln(conn, "Please input your name:")
+	input := bufio.NewScanner(conn)
+	for input.Scan() {
+		name = input.Text()
+		break
+	}
+	return name
+
+}
 func handleConn(conn net.Conn) {
-	ch := make(chan string)
-	who := conn.RemoteAddr().String()
+	ch := make(chan string, 10)
+	who := getScreenName(conn) //conn.RemoteAddr().String()
 	cli := client{ch, who}
-	timer := time.NewTimer(60 * time.Second)
+	timer := time.NewTimer(5 * time.Minute)
 
 	go clientWrite(conn, ch)
 	go idleCloser(conn, timer)
 
-	ch <- "You are: " + who
+	ch <- "You are: " + who + " at " + conn.RemoteAddr().String()
 	messages <- who + " has arrived"
 	entering <- cli
 
 	input := bufio.NewScanner(conn)
 	for input.Scan() {
 		messages <- who + ": " + input.Text()
-		timer.Reset(60 * time.Second)
+		if !timer.Stop() {
+			<-timer.C
+		}
+		timer.Reset(5 * time.Minute)
 	}
 
 	leaving <- cli
@@ -83,7 +93,10 @@ func broadcaster() {
 		select {
 		case msg := <-messages:
 			for cli := range clients {
-				cli.ch <- msg
+				select {
+				case cli.ch <- msg:
+				default:
+				}
 			}
 		case new := <-entering:
 			clients[new] = true
